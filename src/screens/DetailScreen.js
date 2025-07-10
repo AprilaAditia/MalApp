@@ -1,104 +1,132 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  ScrollView,
+  Animated,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { saveViewedAnime, saveFavoriteAnime } from '../utils/storage';
+import { useNavigation } from '@react-navigation/native';
 
 const DetailScreen = ({ route }) => {
   const { anime } = route.params;
+  const navigation = useNavigation();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [isFavorited, setIsFavorited] = useState(false);
+
+  useEffect(() => {
+    saveViewedAnime(anime);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const handleAddToFavorites = async () => {
+    await saveFavoriteAnime(anime);
+    setIsFavorited(true);
+    Alert.alert('Success', 'Added to favorites!');
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        source={typeof anime.image === 'string' ? { uri: anime.image } : anime.image}
-        style={styles.image}
+      {/* Tombol kembali */}
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
+      {/* Gambar */}
+      <Animated.Image
+        source={anime.image}
+        style={[styles.image, { opacity: fadeAnim }]}
+        resizeMode="cover"
       />
 
       <Text style={styles.title}>{anime.title}</Text>
 
-      <Text style={styles.rating}>⭐ {anime.rating}</Text>
+      <Text style={styles.info}>
+        Genre:{' '}
+        {Array.isArray(anime.genre) ? anime.genre.join(', ') : anime.genre || 'N/A'}
+      </Text>
 
-      <View style={styles.infoGrid}>
-        <View style={styles.infoCard}>
-          <Text style={styles.cardLabel}>Genre</Text>
-          <Text style={styles.cardValue}>{anime.genre}</Text>
-        </View>
-        <View style={styles.infoCard}>
-          <Text style={styles.cardLabel}>Type</Text>
-          <Text style={styles.cardValue}>{anime.type}</Text>
-        </View>
-        <View style={styles.infoCard}>
-          <Text style={styles.cardLabel}>Episodes</Text>
-          <Text style={styles.cardValue}>{anime.episodes}</Text>
-        </View>
-        <View style={styles.infoCard}>
-          <Text style={styles.cardLabel}>Season</Text>
-          <Text style={styles.cardValue}>{anime.season}</Text>
-        </View>
-      </View>
+      <Text style={styles.info}>Season: {anime.season || 'N/A'}</Text>
 
-      <Text style={styles.synopsisTitle}>Synopsis</Text>
-      <Text style={styles.synopsis}>{anime.synopsis}</Text>
+      <Text style={styles.info}>
+        Description: {anime.synopsis || 'N/A'}
+      </Text>
+
+      {/* Tombol favorite */}
+      <TouchableOpacity
+        style={[styles.button, isFavorited && styles.buttonDisabled]}
+        onPress={handleAddToFavorites}
+        disabled={isFavorited}
+      >
+        <Text style={styles.buttonText}>
+          {isFavorited ? 'Favorited ❤️' : 'Add to Favorite'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Navigasi ke episode (placeholder) */}
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#4a90e2' }]}
+        onPress={() => Alert.alert('Coming Soon', 'Daftar episode akan segera tersedia!')}
+      >
+        <Text style={styles.buttonText}>View Episodes</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#fafafa',
+    padding: 20,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+  },
+  backButton: {
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#007bff',
   },
   image: {
-    width: '100%',
-    height: 250,
-    borderRadius: 8,
-    marginBottom: 16,
+    width: 220,
+    height: 320,
+    borderRadius: 16,
+    marginBottom: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#1b1b1b',
-    marginBottom: 4,
+    marginBottom: 15,
+    textAlign: 'center',
   },
-  rating: {
-    fontSize: 14,
-    color: '#ff9500',
-    marginBottom: 16,
-  },
-  infoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  infoCard: {
-    width: '48%',
-    backgroundColor: '#fff',
-    borderRadius: 6,
-    padding: 10,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-  },
-  cardLabel: {
-    fontSize: 12,
-    color: '#777',
-  },
-  cardValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-  },
-  synopsisTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 6,
-  },
-  synopsis: {
-    fontSize: 14,
-    color: '#444',
+  info: {
+    fontSize: 16,
+    marginBottom: 10,
     lineHeight: 22,
+    textAlign: 'center',
+  },
+  button: {
+    backgroundColor: '#28a745',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginTop: 15,
+  },
+  buttonDisabled: {
+    backgroundColor: '#aaa',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
   },
 });
 

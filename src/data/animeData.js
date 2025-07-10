@@ -2,7 +2,7 @@ export default [
   {
     id: 1,
     title: 'Sono Bisque Doll wa Koi wo Suru Season 2',
-    genre: 'Otaku Culture, Romance',
+    genre: ['Otaku Culture', 'Romance'],
     type: 'TV',
     episodes: 12,
     rating: '8.3',
@@ -13,7 +13,7 @@ export default [
   {
     id: 2,
     title: 'Dandadan 2nd Season',
-    genre: 'Action, Comedy, Shounen',
+    genre: ['Action', 'Comedy', 'Shounen'],
     type: 'TV',
     episodes: 13,
     rating: '8.0',
@@ -24,7 +24,7 @@ export default [
   {
     id: 3,
     title: 'Kaoru Hana Wa Rin to Saku',
-    genre: 'Drama, Romance',
+    genre: ['Drama', 'Romance'],
     type: 'TV',
     episodes: 12,
     rating: '7.9',
@@ -35,7 +35,7 @@ export default [
   {
     id: 4,
     title: 'Yofukashi no Uta Season 2',
-    genre: 'Romance, Supernatural',
+    genre: ['Romance', 'Supernatural'],
     type: 'TV',
     episodes: 12,
     rating: '8.1',
@@ -46,7 +46,7 @@ export default [
   {
     id: 5,
     title: 'Watashi ga Koibito ni Nareru Wake Nai jan, Muri Muri!',
-    genre: 'Comedy, Girls Love',
+    genre: ['Comedy', 'Girls Love'],
     type: 'TV',
     episodes: 10,
     rating: '7.4',

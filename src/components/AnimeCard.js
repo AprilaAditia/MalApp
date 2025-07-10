@@ -1,66 +1,44 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
-const AnimeCard = ({ anime }) => {
+const AnimeCard = ({ anime, onPress }) => {
   return (
-    <View style={styles.card}>
-      <View style={styles.imageWrapper}>
-        <Image
-          source={typeof anime.image === 'string' ? { uri: anime.image } : anime.image}
-          style={styles.image}
-        />
-        <View style={styles.ratingTag}>
-          <Text style={styles.ratingText}>⭐ {anime.rating}</Text>
-        </View>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
+      <Image source={anime.image} style={styles.image} />
+      <View style={styles.info}>
+        <Text style={styles.title} numberOfLines={2}>{anime.title}</Text>
+        <Text style={styles.rating}>⭐ {anime.rating}</Text>
       </View>
-      <Text style={styles.title} numberOfLines={2}>
-        {anime.title}
-      </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
-    width: 160,
+    flex: 1,
     backgroundColor: '#fff',
+    margin: 6,
     borderRadius: 8,
     overflow: 'hidden',
-    elevation: 3,
-    marginHorizontal: 4,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 2,
-  },
-  imageWrapper: {
-    position: 'relative',
+    elevation: 2,
   },
   image: {
     width: '100%',
-    height: 220,
+    height: 200,
     resizeMode: 'cover',
   },
-  ratingTag: {
-    position: 'absolute',
-    bottom: 6,
-    right: 6,
-    backgroundColor: '#000000b3',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  ratingText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+  info: {
+    padding: 8,
   },
   title: {
-    padding: 8,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 'bold',
-    color: '#222',
-    textAlign: 'center',
+    color: '#333',
+    marginBottom: 4,
+  },
+  rating: {
+    fontSize: 12,
+    color: '#777',
   },
 });
 

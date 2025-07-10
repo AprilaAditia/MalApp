@@ -1,140 +1,99 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  TextInput,
-  TouchableOpacity,
-  SafeAreaView,
-  StyleSheet,
+  View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AnimeCard from '../components/AnimeCard';
-import animeData from '../data/animeData';
+import animeList from '../data/animeData';
+
+const seasons = ['All', 'Spring', 'Summer', 'Fall', 'Winter'];
 
 const HomeScreen = () => {
-  const [season, setSeason] = useState('Summer');
-  const [search, setSearch] = useState('');
+  const [searchText, setSearchText] = useState('');
+  const [selectedGenre, setSelectedGenre] = useState('');
+  const [selectedSeason, setSelectedSeason] = useState('All');
+  const [filteredList, setFilteredList] = useState(animeList);
+
   const navigation = useNavigation();
 
-  // Filter berdasarkan season & pencarian
-  const filteredData = animeData
-    .filter(anime => anime.season === season)
-    .filter(anime =>
-      anime.title.toLowerCase().includes(search.toLowerCase())
-    );
+  useEffect(() => {
+    applyFilters();
+  }, [searchText, selectedGenre, selectedSeason]);
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('Detail', { anime: item })}
-      activeOpacity={0.85}
-    >
-      <AnimeCard anime={item} />
-    </TouchableOpacity>
-  );
+  const applyFilters = () => {
+    const lowerSearch = searchText.toLowerCase();
+    const filtered = animeList.filter(anime => {
+      const matchTitle = anime.title.toLowerCase().includes(lowerSearch);
+      const matchGenre = selectedGenre ? anime.genre.includes(selectedGenre) : true;
+      const matchSeason = selectedSeason !== 'All' ? anime.season === selectedSeason : true;
+      return matchTitle && matchGenre && matchSeason;
+    });
+
+    setFilteredList(filtered);
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Anime {season} 2025</Text>
-
-      {/* Search Input */}
+    <View style={styles.container}>
       <TextInput
-        placeholder="Search anime..."
-        value={search}
-        onChangeText={setSearch}
+        placeholder="Cari anime..."
+        value={searchText}
+        onChangeText={setSearchText}
         style={styles.searchInput}
       />
 
-      {/* Season Tabs */}
-      <View style={styles.seasonTabs}>
-        {['Spring', 'Summer', 'Fall', 'Winter'].map(s => (
+      <View style={styles.filterRow}>
+        {seasons.map(season => (
           <TouchableOpacity
-            key={s}
-            style={[styles.seasonButton, season === s && styles.seasonButtonActive]}
-            onPress={() => setSeason(s)}
+            key={season}
+            style={[styles.seasonBtn, selectedSeason === season && styles.selected]}
+            onPress={() => setSelectedSeason(season)}
           >
-            <Text style={[styles.seasonText, season === s && styles.seasonTextActive]}>
-              {s}
-            </Text>
+            <Text>{season}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Anime Grid */}
-      {filteredData.length === 0 ? (
-        <Text style={styles.emptyText}>No anime found for "{season}"</Text>
-      ) : (
-        <FlatList
-          data={filteredData}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => `${item.title}-${index}`}
-          numColumns={2}
-          contentContainerStyle={styles.listContent}
-          columnWrapperStyle={styles.row}
-        />
-      )}
-    </SafeAreaView>
+      <FlatList
+        data={filteredList}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <AnimeCard
+            anime={item}
+            onPress={() => navigation.navigate('Detail', { anime: item })}
+          />
+        )}
+        horizontal={false}
+        numColumns={2}
+        contentContainerStyle={{ paddingBottom: 100 }}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f4f4f4',
-    paddingTop: 16,
-    paddingHorizontal: 12,
-  },
-  heading: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    color: '#111',
-  },
+  container: { flex: 1, padding: 10, backgroundColor: '#f2f2f2' },
   searchInput: {
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 8,
-    marginBottom: 10,
-    fontSize: 14,
-    color: '#333',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    marginBottom: 10
   },
-  seasonTabs: {
+  filterRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 12,
+    justifyContent: 'space-around',
+    marginBottom: 10,
+    flexWrap: 'wrap'
   },
-  seasonButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    backgroundColor: '#ddd',
+  seasonBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: '#eee',
+    borderRadius: 6,
+    margin: 4
   },
-  seasonButtonActive: {
-    backgroundColor: '#007bff',
-  },
-  seasonText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#444',
-  },
-  seasonTextActive: {
-    color: '#fff',
-  },
-  listContent: {
-    paddingBottom: 20,
-  },
-  row: {
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  emptyText: {
-    textAlign: 'center',
-    marginTop: 40,
-    fontSize: 16,
-    color: '#777',
-  },
+  selected: {
+    backgroundColor: '#cce5ff'
+  }
 });
 
 export default HomeScreen;
