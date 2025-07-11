@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  View, Text, TextInput, FlatList, StyleSheet, TouchableOpacity
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AnimeCard from '../components/AnimeCard';
@@ -22,10 +27,22 @@ const HomeScreen = () => {
 
   const applyFilters = () => {
     const lowerSearch = searchText.toLowerCase();
-    const filtered = animeList.filter(anime => {
+    const filtered = animeList.filter((anime) => {
       const matchTitle = anime.title.toLowerCase().includes(lowerSearch);
-      const matchGenre = selectedGenre ? anime.genre.includes(selectedGenre) : true;
-      const matchSeason = selectedSeason !== 'All' ? anime.season === selectedSeason : true;
+
+      const genreArray = Array.isArray(anime.genre)
+        ? anime.genre
+        : anime.genre?.split(',') || [];
+
+      const matchGenre = selectedGenre
+        ? genreArray.map((g) => g.trim().toLowerCase()).includes(selectedGenre.toLowerCase())
+        : true;
+
+      const matchSeason =
+        selectedSeason !== 'All'
+          ? anime.season?.toLowerCase() === selectedSeason.toLowerCase()
+          : true;
+
       return matchTitle && matchGenre && matchSeason;
     });
 
@@ -35,17 +52,20 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Cari anime..."
+        placeholder="Search anime..."
         value={searchText}
         onChangeText={setSearchText}
         style={styles.searchInput}
       />
 
       <View style={styles.filterRow}>
-        {seasons.map(season => (
+        {seasons.map((season) => (
           <TouchableOpacity
             key={season}
-            style={[styles.seasonBtn, selectedSeason === season && styles.selected]}
+            style={[
+              styles.seasonBtn,
+              selectedSeason === season && styles.selected,
+            ]}
             onPress={() => setSelectedSeason(season)}
           >
             <Text>{season}</Text>
@@ -55,7 +75,7 @@ const HomeScreen = () => {
 
       <FlatList
         data={filteredList}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         renderItem={({ item }) => (
           <AnimeCard
             anime={item}
@@ -76,24 +96,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     borderRadius: 8,
-    marginBottom: 10
+    marginBottom: 10,
   },
   filterRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginBottom: 10,
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   seasonBtn: {
     paddingHorizontal: 10,
     paddingVertical: 5,
     backgroundColor: '#eee',
     borderRadius: 6,
-    margin: 4
+    margin: 4,
   },
   selected: {
-    backgroundColor: '#cce5ff'
-  }
+    backgroundColor: '#cce5ff',
+  },
 });
 
 export default HomeScreen;

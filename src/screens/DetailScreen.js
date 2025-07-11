@@ -35,17 +35,13 @@ const DetailScreen = ({ route }) => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Tombol kembali */}
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Text style={styles.backText}>← Back</Text>
       </TouchableOpacity>
 
-      {/* Gambar */}
-      <Animated.Image
-        source={anime.image}
-        style={[styles.image, { opacity: fadeAnim }]}
-        resizeMode="cover"
-      />
+      <Animated.View style={{ opacity: fadeAnim }}>
+        <Image source={anime.image} style={styles.image} resizeMode="cover" />
+      </Animated.View>
 
       <Text style={styles.title}>{anime.title}</Text>
 
@@ -60,7 +56,6 @@ const DetailScreen = ({ route }) => {
         Description: {anime.synopsis || 'N/A'}
       </Text>
 
-      {/* Tombol favorite */}
       <TouchableOpacity
         style={[styles.button, isFavorited && styles.buttonDisabled]}
         onPress={handleAddToFavorites}
@@ -71,7 +66,6 @@ const DetailScreen = ({ route }) => {
         </Text>
       </TouchableOpacity>
 
-      {/* Navigasi ke episode (placeholder) */}
       <TouchableOpacity
         style={[styles.button, { backgroundColor: '#4a90e2' }]}
         onPress={() => Alert.alert('Coming Soon', 'Daftar episode akan segera tersedia!')}
